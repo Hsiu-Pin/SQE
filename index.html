@@ -9,25 +9,31 @@
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap');
         body {
             font-family: 'Noto Sans TC', sans-serif;
-            background-color: #f3f4f6;
+            background-color: #1a1a1b; /* 深灰黑色背景 */
             -webkit-tap-highlight-color: transparent;
         }
         .option-card {
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            background-color: #2d2d2e; /* 選項卡片深色背景 */
+            border-color: #3f3f40;
+        }
+        .option-card:hover {
+            border-color: #6366f1;
+            background-color: #353536;
         }
         .option-card:active {
             transform: scale(0.98);
         }
         .correct {
-            background-color: #d1fae5 !important;
+            background-color: #064e3b !important;
             border-color: #10b981 !important;
-            color: #065f46 !important;
+            color: #ecfdf5 !important;
             box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2);
         }
         .wrong {
-            background-color: #fee2e2 !important;
+            background-color: #7f1d1d !important;
             border-color: #ef4444 !important;
-            color: #991b1b !important;
+            color: #fef2f2 !important;
             box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.2);
         }
         .fade-in {
@@ -38,15 +44,26 @@
             to { opacity: 1; transform: translateY(0); }
         }
         .wrong-mode-bg {
-            background-color: #fef2f2 !important;
+            background-color: #1c1010 !important; /* 錯題模式稍微帶紅的深色 */
+        }
+        /* 自定義滾動條 */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1a1a1b;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #3f3f40;
+            border-radius: 10px;
         }
     </style>
 </head>
-<body id="body-bg" class="min-h-screen flex items-center justify-center p-4 bg-slate-50">
+<body id="body-bg" class="min-h-screen flex items-center justify-center p-4">
 
-    <div id="app" class="max-w-2xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
+    <div id="app" class="max-w-2xl w-full bg-[#242425] rounded-3xl shadow-2xl overflow-hidden border border-[#3f3f40]">
         <!-- Header -->
-        <div id="header-bar" class="bg-indigo-600 p-6 text-white relative transition-colors duration-500">
+        <div id="header-bar" class="bg-indigo-700 p-6 text-white relative transition-colors duration-500">
             <!-- 恢復進度 Banner -->
             <div id="restore-banner" class="hidden absolute inset-0 bg-slate-900/95 z-30 flex flex-col items-center justify-center p-4 text-center">
                 <p class="mb-4 text-sm font-medium">偵測到上次儲存的進度，是否繼續？</p>
@@ -58,19 +75,18 @@
 
             <div class="flex justify-between items-start mb-4">
                 <div class="flex flex-col items-start space-y-2">
-                    <!-- Reset 功能靠左 -->
                     <button onclick="confirmFullReset()" class="bg-white/10 hover:bg-red-500 text-white text-[10px] py-1 px-2 rounded-md transition-colors flex items-center space-x-1">
                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                         <span>系統全重置</span>
                     </button>
-                    <span id="set-label" class="bg-indigo-500 text-xs py-1 px-2 rounded-md uppercase tracking-wider font-bold">Group 1</span>
+                    <span id="set-label" class="bg-indigo-500/50 text-xs py-1 px-2 rounded-md uppercase tracking-wider font-bold border border-indigo-400/30">Group 1</span>
                     <h1 class="text-2xl font-bold mt-1">FLK 測驗</h1>
                 </div>
                 <div class="text-right flex flex-col items-end space-y-2">
-                    <div id="timer-display" class="bg-black/20 px-3 py-1.5 rounded-lg flex items-center space-x-2">
+                    <div id="timer-display" class="bg-black/30 px-3 py-1.5 rounded-lg flex items-center space-x-2 border border-white/10">
                         <span class="text-[10px] opacity-80">剩餘時間</span>
                         <span id="timer-text" class="text-lg font-mono font-bold text-yellow-400">153:00</span>
-                        <button onclick="toggleTimer()" id="timer-control-btn" class="bg-white/20 hover:bg-white/30 px-2 py-1 rounded flex items-center space-x-1 transition-colors">
+                        <button onclick="toggleTimer()" id="timer-control-btn" class="bg-white/10 hover:bg-white/20 px-2 py-1 rounded flex items-center space-x-1 transition-colors">
                             <svg id="timer-icon" class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zM8 7a1 1 0 00-1-1H7a1 1 0 00-1 1v6a1 1 0 001 1h1a1 1 0 001-1V7zM13 7a1 1 0 00-1-1h-1a1 1 0 00-1 1v6a1 1 0 001 1h1a1 1 0 001-1V7z"></path></svg>
                         </button>
                     </div>
@@ -81,24 +97,23 @@
                 </div>
             </div>
             
-            <div class="h-2 bg-black/20 rounded-full overflow-hidden">
-                <div id="progress-bar" class="h-full bg-yellow-400 rounded-full transition-all duration-700 ease-out" style="width: 0%"></div>
+            <div class="h-2 bg-black/40 rounded-full overflow-hidden border border-white/5">
+                <div id="progress-bar" class="h-full bg-yellow-400 rounded-full transition-all duration-700 ease-out shadow-[0_0_8px_rgba(250,204,21,0.5)]" style="width: 0%"></div>
             </div>
             
             <div class="flex justify-between mt-2 items-center">
-                <p id="progress-text" class="text-[10px] opacity-80 uppercase tracking-widest font-medium">分組載入中...</p>
+                <p id="progress-text" class="text-[10px] opacity-80 uppercase tracking-widest font-medium text-indigo-100">分組載入中...</p>
                 <div class="flex space-x-2">
-                    <button onclick="saveCurrentProgress()" class="bg-blue-500 hover:bg-blue-600 text-white text-[10px] rounded px-2 py-1 transition-colors flex items-center space-x-1">
+                    <button onclick="saveCurrentProgress()" class="bg-blue-600 hover:bg-blue-500 text-white text-[10px] rounded px-2 py-1 transition-colors flex items-center space-x-1">
                         <span>手動存檔</span>
                     </button>
-                    <!-- Reset 錯題本按鈕 -->
-                    <button id="reset-wrong-btn" onclick="confirmResetWrong()" class="hidden bg-orange-500 hover:bg-orange-600 text-white text-[10px] rounded px-2 py-1 transition-colors">
+                    <button id="reset-wrong-btn" onclick="confirmResetWrong()" class="hidden bg-orange-600 hover:bg-orange-500 text-white text-[10px] rounded px-2 py-1 transition-colors">
                         清空錯題本
                     </button>
-                    <button onclick="toggleWrongBook()" id="wrong-book-btn" class="bg-red-500 hover:bg-red-600 text-white text-[10px] rounded px-2 py-1 transition-colors">
+                    <button onclick="toggleWrongBook()" id="wrong-book-btn" class="bg-red-600 hover:bg-red-500 text-white text-[10px] rounded px-2 py-1 transition-colors">
                         錯題本 (<span id="wrong-count">0</span>)
                     </button>
-                    <select id="group-selector" onchange="jumpToGroup(this.value)" class="bg-white/10 text-white text-[10px] border-none rounded px-2 py-1 outline-none cursor-pointer">
+                    <select id="group-selector" onchange="jumpToGroup(this.value)" class="bg-black/30 text-white text-[10px] border border-white/10 rounded px-2 py-1 outline-none cursor-pointer">
                     </select>
                 </div>
             </div>
@@ -106,23 +121,23 @@
 
         <!-- Quiz Area -->
         <div id="quiz-container" class="p-6 md:p-10 relative min-h-[400px]">
-            <div id="pause-overlay" class="hidden absolute inset-0 bg-white/95 z-10 flex flex-col items-center justify-center backdrop-blur-md">
-                <h3 class="text-2xl font-black text-indigo-900 mb-2">測驗暫停中</h3>
-                <button onclick="toggleTimer()" class="bg-indigo-600 text-white px-8 py-3 rounded-2xl font-bold">恢復測驗</button>
+            <div id="pause-overlay" class="hidden absolute inset-0 bg-[#1a1a1b]/95 z-10 flex flex-col items-center justify-center backdrop-blur-md">
+                <h3 class="text-2xl font-black text-white mb-4">測驗暫停中</h3>
+                <button onclick="toggleTimer()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-8 py-3 rounded-2xl font-bold shadow-lg transition-all">恢復測驗</button>
             </div>
 
             <div id="question-box" class="fade-in">
                 <div class="flex items-center justify-between mb-4">
-                    <span id="question-id-tag" class="text-xs font-bold px-2.5 py-1 rounded-full">#題號</span>
-                    <span id="mode-tag" class="text-[10px] font-bold text-gray-400 uppercase">一般練習模式</span>
+                    <span id="question-id-tag" class="text-xs font-bold px-2.5 py-1 rounded-full bg-indigo-900/40 text-indigo-300 border border-indigo-700/50">#題號</span>
+                    <span id="mode-tag" class="text-[10px] font-bold text-gray-500 uppercase">一般練習模式</span>
                 </div>
-                <h2 id="question-text" class="text-lg md:text-xl font-medium text-gray-800 mb-8 leading-relaxed">載入題目中...</h2>
+                <h2 id="question-text" class="text-lg md:text-xl font-medium text-gray-100 mb-8 leading-relaxed">載入題目中...</h2>
                 <div id="options-container" class="space-y-4"></div>
             </div>
 
             <div id="feedback-area" class="mt-8 hidden">
-                <div id="feedback-message" class="p-4 rounded-2xl mb-4 font-medium text-sm"></div>
-                <button id="next-btn" class="w-full bg-gray-900 hover:bg-black text-white font-bold py-4 rounded-2xl transition-all flex justify-center items-center space-x-2">
+                <div id="feedback-message" class="p-4 rounded-2xl mb-4 font-medium text-sm text-center"></div>
+                <button id="next-btn" class="w-full bg-white hover:bg-gray-200 text-black font-bold py-4 rounded-2xl transition-all flex justify-center items-center space-x-2 shadow-xl">
                     <span>下一題</span>
                 </button>
             </div>
@@ -130,33 +145,33 @@
 
         <!-- Result Screen -->
         <div id="result-screen" class="p-8 md:p-10 hidden text-center fade-in">
-            <h2 class="text-3xl font-extrabold text-gray-900 mb-6">練習結束</h2>
+            <h2 class="text-3xl font-extrabold text-white mb-6">練習結束</h2>
             <div class="grid grid-cols-2 gap-4 mb-6">
-                <div class="bg-slate-50 p-4 rounded-2xl border border-gray-100">
+                <div class="bg-black/20 p-4 rounded-2xl border border-[#3f3f40]">
                     <span class="block text-gray-400 text-sm">得分</span>
-                    <span class="text-2xl font-bold text-indigo-600" id="final-score-text">0/0</span>
+                    <span class="text-2xl font-bold text-indigo-400" id="final-score-text">0/0</span>
                 </div>
-                <div class="bg-slate-50 p-4 rounded-2xl border border-gray-100">
+                <div class="bg-black/20 p-4 rounded-2xl border border-[#3f3f40]">
                     <span class="block text-gray-400 text-sm">正確率</span>
-                    <span class="text-2xl font-bold text-indigo-600" id="final-accuracy-text">0%</span>
+                    <span class="text-2xl font-bold text-indigo-400" id="final-accuracy-text">0%</span>
                 </div>
             </div>
             <div class="space-y-3">
-                <button id="next-group-btn" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-2xl hidden">下一組</button>
-                <button onclick="restartCurrentSession(true)" class="w-full bg-indigo-600 text-white font-bold py-4 rounded-2xl">本組亂序重做</button>
-                <button onclick="exitToNormal()" class="w-full bg-gray-100 text-gray-700 font-bold py-4 rounded-2xl">回到首頁</button>
+                <button id="next-group-btn" class="w-full bg-green-700 hover:bg-green-600 text-white font-bold py-4 rounded-2xl hidden shadow-lg transition-all">下一組</button>
+                <button onclick="restartCurrentSession(true)" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-4 rounded-2xl shadow-lg transition-all">本組亂序重做</button>
+                <button onclick="exitToNormal()" class="w-full bg-[#3f3f40] hover:bg-[#4f4f50] text-gray-200 font-bold py-4 rounded-2xl transition-all">回到首頁</button>
             </div>
         </div>
     </div>
 
     <!-- 自定義對話框 -->
-    <div id="custom-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-        <div class="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl text-center">
-            <h3 id="modal-title" class="text-xl font-bold mb-2">確認操作</h3>
-            <p id="modal-desc" class="text-gray-500 mb-6 text-sm"></p>
+    <div id="custom-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+        <div class="bg-[#2d2d2e] rounded-3xl p-8 max-w-sm w-full shadow-2xl text-center border border-[#3f3f40]">
+            <h3 id="modal-title" class="text-xl font-bold mb-2 text-white">確認操作</h3>
+            <p id="modal-desc" class="text-gray-400 mb-6 text-sm"></p>
             <div class="flex space-x-3">
-                <button onclick="closeModal()" class="flex-1 bg-gray-100 py-3 rounded-2xl font-bold text-gray-600">取消</button>
-                <button id="modal-confirm-btn" class="flex-1 bg-red-600 py-3 rounded-2xl font-bold text-white shadow-lg">確定</button>
+                <button onclick="closeModal()" class="flex-1 bg-[#3f3f40] py-3 rounded-2xl font-bold text-gray-200">取消</button>
+                <button id="modal-confirm-btn" class="flex-1 bg-red-700 py-3 rounded-2xl font-bold text-white shadow-lg">確定</button>
             </div>
         </div>
     </div>
@@ -193,18 +208,13 @@
             }
         };
 
-        // --- 分組邏輯：30一組，未滿30併入前一組 ---
         function createGroups() {
             groupedQuestions = [];
             let total = allQuestions.length;
             let tempGroups = [];
-            
-            // 先按 30 題分
             for (let i = 0; i < total; i += BASE_PER_GROUP) {
                 tempGroups.push(allQuestions.slice(i, i + BASE_PER_GROUP));
             }
-
-            // 處理合併邏輯：如果最後一組不足 30 且這不是唯一的一組
             if (tempGroups.length > 1) {
                 let lastIdx = tempGroups.length - 1;
                 if (tempGroups[lastIdx].length < BASE_PER_GROUP) {
@@ -215,7 +225,6 @@
             groupedQuestions = tempGroups;
         }
 
-        // --- 重置功能 ---
         function showModal(title, desc, onConfirm) {
             document.getElementById('modal-title').innerText = title;
             document.getElementById('modal-desc').innerText = desc;
@@ -241,7 +250,6 @@
             });
         }
 
-        // --- 計時與進度 ---
         function startTimer() {
             if (timerInterval) clearInterval(timerInterval);
             timerInterval = setInterval(() => {
@@ -297,7 +305,6 @@
             localStorage.setItem(LOCAL_STORAGE_KEY_PROGRESS, JSON.stringify(data));
         }
 
-        // --- 核心測驗流程 ---
         function renderGroupSelector() {
             const sel = document.getElementById('group-selector');
             sel.innerHTML = '';
@@ -339,10 +346,10 @@
             
             if (isWrongBookMode) {
                 idTag.innerText = `#錯題題號 ${q.id}`;
-                idTag.className = 'text-xs font-bold px-2.5 py-1 rounded-full bg-red-100 text-red-700';
+                idTag.className = 'text-xs font-bold px-2.5 py-1 rounded-full bg-red-900/40 text-red-300 border border-red-700/50';
             } else {
                 idTag.innerText = `#題號 ${q.id}`;
-                idTag.className = 'text-xs font-bold px-2.5 py-1 rounded-full bg-indigo-100 text-indigo-700';
+                idTag.className = 'text-xs font-bold px-2.5 py-1 rounded-full bg-indigo-900/40 text-indigo-300 border border-indigo-700/50';
             }
 
             document.getElementById('question-text').innerText = q.question;
@@ -351,8 +358,8 @@
             
             Object.entries(q.options).forEach(([key, val]) => {
                 const btn = document.createElement('button');
-                btn.className = 'option-card w-full text-left p-4 rounded-2xl border-2 border-gray-100 bg-white flex items-start shadow-sm';
-                btn.innerHTML = `<span class="font-bold mr-4 text-indigo-600">${key}.</span><span class="text-gray-700">${val}</span>`;
+                btn.className = 'option-card w-full text-left p-4 rounded-2xl border-2 flex items-start shadow-sm';
+                btn.innerHTML = `<span class="font-bold mr-4 text-indigo-400">${key}.</span><span class="text-gray-200">${val}</span>`;
                 btn.onclick = () => checkAnswer(key, btn);
                 btn.dataset.key = key;
                 container.appendChild(btn);
@@ -373,15 +380,19 @@
                 else if (b.dataset.key === key) b.classList.add('wrong');
             });
 
+            const feedback = document.getElementById('feedback-message');
             if (key === correctKey) {
                 score++;
+                feedback.className = "p-4 rounded-2xl mb-4 font-medium text-sm text-center bg-green-900/30 text-green-300 border border-green-700/50";
+                feedback.innerText = "正確！";
                 if (isWrongBookMode) removeFromWrong(q.id);
             } else {
+                feedback.className = "p-4 rounded-2xl mb-4 font-medium text-sm text-center bg-red-900/30 text-red-300 border border-red-700/50";
+                feedback.innerText = `錯誤，正確答案是 ${correctKey}`;
                 saveToWrong(q.id);
             }
             
             document.getElementById('feedback-area').classList.remove('hidden');
-            document.getElementById('feedback-message').innerText = key === correctKey ? "正確！" : `錯誤，正確答案是 ${correctKey}`;
         }
 
         function updateProgress() {
@@ -392,7 +403,6 @@
             document.getElementById('live-accuracy').innerText = `${acc}%`;
         }
 
-        // --- 錯題本邏輯 ---
         function saveToWrong(id) {
             let ids = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WRONG) || '[]');
             if (!ids.includes(id)) {
@@ -413,16 +423,16 @@
 
         function enterWrongBookMode(restoring = false) {
             const wrongIds = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WRONG) || '[]');
-            if (wrongIds.length === 0) return alert("尚無錯題紀錄");
+            if (wrongIds.length === 0) return;
             
             isWrongBookMode = true;
             currentQuizData = allQuestions.filter(q => wrongIds.includes(q.id));
             
-            document.getElementById('header-bar').className = 'bg-red-700 p-6 text-white relative transition-colors';
+            document.getElementById('header-bar').className = 'bg-red-800 p-6 text-white relative transition-colors';
             document.getElementById('body-bg').classList.add('wrong-mode-bg');
             document.getElementById('reset-wrong-btn').classList.remove('hidden');
             document.getElementById('mode-tag').innerText = "錯題複習模式";
-            document.getElementById('mode-tag').classList.replace('text-gray-400', 'text-red-500');
+            document.getElementById('mode-tag').classList.replace('text-gray-500', 'text-red-400');
             document.getElementById('wrong-book-btn').innerText = "退出模式";
             
             if (!restoring) { currentQuestionIndex = 0; score = 0; answeredTotal = 0; }
@@ -432,11 +442,11 @@
 
         function exitToNormal() {
             isWrongBookMode = false;
-            document.getElementById('header-bar').className = 'bg-indigo-600 p-6 text-white relative transition-colors';
+            document.getElementById('header-bar').className = 'bg-indigo-700 p-6 text-white relative transition-colors';
             document.getElementById('body-bg').classList.remove('wrong-mode-bg');
             document.getElementById('reset-wrong-btn').classList.add('hidden');
             document.getElementById('mode-tag').innerText = "一般練習模式";
-            document.getElementById('mode-tag').className = "text-[10px] font-bold text-gray-400 uppercase";
+            document.getElementById('mode-tag').className = "text-[10px] font-bold text-gray-500 uppercase";
             updateWrongCountDisplay();
             initQuiz(currentGroupIndex);
         }
@@ -455,6 +465,10 @@
                 nxt.classList.remove('hidden');
                 nxt.onclick = () => initQuiz(currentGroupIndex + 1);
             } else { nxt.classList.add('hidden'); }
+        }
+
+        function restartCurrentSession(shuffleNeeded = false) {
+            initQuiz(currentGroupIndex, shuffleNeeded);
         }
 
         function shuffle(arr) {
