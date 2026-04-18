@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FLK題目練習系統 (進度存檔版)</title>
+    <title>FLK 題目練習系統 (手動存檔計時版)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap');
@@ -45,30 +45,48 @@
         <!-- Header -->
         <div class="bg-indigo-600 p-6 text-white relative">
             <!-- 進度回復提示彈窗 -->
-            <div id="restore-banner" class="hidden absolute inset-0 bg-indigo-900/95 z-20 flex flex-col items-center justify-center p-4 text-center">
-                <p class="mb-4 text-sm font-medium">偵測到上次未完成的進度，是否繼續？</p>
+            <div id="restore-banner" class="hidden absolute inset-0 bg-indigo-900/95 z-30 flex flex-col items-center justify-center p-4 text-center">
+                <p class="mb-4 text-sm font-medium">偵測到上次手動儲存的進度，是否繼續？</p>
                 <div class="flex space-x-3">
                     <button onclick="restoreProgress()" class="bg-yellow-400 hover:bg-yellow-500 text-indigo-900 px-4 py-2 rounded-xl font-bold text-xs transition-all">載入進度</button>
                     <button onclick="clearProgressData()" class="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-xl font-bold text-xs transition-all">重新開始</button>
                 </div>
             </div>
 
-            <div class="flex justify-between items-end mb-4">
+            <div class="flex justify-between items-start mb-4">
                 <div>
                     <span id="set-label" class="bg-indigo-500 text-xs py-1 px-2 rounded-md uppercase tracking-wider font-bold">Group 1</span>
-                    <h1 class="text-2xl font-bold mt-1">FLK測驗</h1>
+                    <h1 class="text-2xl font-bold mt-1">FLK 測驗</h1>
                 </div>
-                <div id="score-counter" class="text-right">
-                    <span class="text-sm opacity-75">正確率</span>
-                    <div class="text-xl font-mono font-bold" id="live-accuracy">0%</div>
+                <div class="text-right flex flex-col items-end space-y-2">
+                    <!-- 計時器區域 -->
+                    <div id="timer-display" class="bg-indigo-800 px-3 py-1.5 rounded-lg flex items-center space-x-2">
+                        <span class="text-[10px] opacity-80">剩餘時間</span>
+                        <span id="timer-text" class="text-lg font-mono font-bold text-yellow-400">100:00</span>
+                        <button onclick="toggleTimer()" id="timer-control-btn" class="bg-indigo-500 hover:bg-indigo-400 px-2 py-1 rounded flex items-center space-x-1 transition-colors">
+                            <svg id="timer-icon" class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zM8 7a1 1 0 00-1-1H7a1 1 0 00-1 1v6a1 1 0 001 1h1a1 1 0 001-1V7zM13 7a1 1 0 00-1-1h-1a1 1 0 00-1 1v6a1 1 0 001 1h1a1 1 0 001-1V7z"></path></svg>
+                            <span id="timer-status-text" class="text-[10px] font-bold">暫停</span>
+                        </button>
+                    </div>
+                    <div id="score-counter">
+                        <span class="text-sm opacity-75">正確率</span>
+                        <span class="text-xl font-mono font-bold" id="live-accuracy">0%</span>
+                    </div>
                 </div>
             </div>
+            
             <div class="h-2 bg-indigo-800/50 rounded-full overflow-hidden">
                 <div id="progress-bar" class="h-full bg-yellow-400 rounded-full transition-all duration-700 ease-out" style="width: 0%"></div>
             </div>
+            
             <div class="flex justify-between mt-2 items-center">
                 <p id="progress-text" class="text-[10px] opacity-80 uppercase tracking-widest font-medium">準備中...</p>
                 <div class="flex space-x-2">
+                    <!-- 存檔按鈕 -->
+                    <button onclick="saveCurrentProgress()" class="bg-blue-500 hover:bg-blue-600 text-white text-[10px] rounded px-2 py-1 transition-colors flex items-center space-x-1">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
+                        <span>手動存檔</span>
+                    </button>
                     <button onclick="toggleWrongBook()" id="wrong-book-btn" class="bg-red-500 hover:bg-red-600 text-white text-[10px] rounded px-2 py-1 transition-colors">
                         錯題本 (<span id="wrong-count">0</span>)
                     </button>
@@ -80,12 +98,24 @@
         </div>
 
         <!-- Quiz Area -->
-        <div id="quiz-container" class="p-6 md:p-10">
+        <div id="quiz-container" class="p-6 md:p-10 relative">
+            <!-- 暫停遮罩 -->
+            <div id="pause-overlay" class="hidden absolute inset-0 bg-white/95 z-10 flex flex-col items-center justify-center backdrop-blur-md">
+                <div class="bg-indigo-50 p-8 rounded-3xl border-2 border-indigo-100 text-center shadow-xl">
+                    <div class="w-16 h-16 bg-indigo-600 text-white rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
+                    </div>
+                    <h3 class="text-2xl font-black text-indigo-900 mb-2">測驗暫停中</h3>
+                    <p class="text-indigo-600/70 text-sm mb-6">計時已停止，點擊下方按鈕繼續</p>
+                    <button onclick="toggleTimer()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-2xl font-bold shadow-lg transition-all active:scale-95">恢復測驗</button>
+                </div>
+            </div>
+
             <div id="question-box" class="fade-in">
                 <div class="flex items-center justify-between mb-4">
                     <span id="question-id-tag" class="bg-indigo-100 text-indigo-700 text-xs font-bold px-2.5 py-1 rounded-full">Question</span>
                     <div class="flex items-center space-x-2">
-                        <span id="save-status" class="text-[9px] text-green-500 opacity-0 transition-opacity">已自動存檔</span>
+                        <span id="save-status" class="text-[9px] text-green-500 opacity-0 transition-opacity font-bold">進度已儲存</span>
                         <span id="mode-tag" class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">一般練習模式</span>
                     </div>
                 </div>
@@ -146,6 +176,7 @@
 
     <script>
         const QUESTIONS_PER_GROUP = 25;
+        const DEFAULT_TIME_LIMIT = 100 * 60; // 100分鐘
         const LOCAL_STORAGE_KEY_WRONG = 'law_quiz_wrong_ids';
         const LOCAL_STORAGE_KEY_PROGRESS = 'law_quiz_save_data';
 
@@ -161,6 +192,11 @@
         let currentGroupIndex = 0;
         let wrongQuestionsInThisRound = [];
 
+        // 計時器變數
+        let timeRemaining = DEFAULT_TIME_LIMIT;
+        let timerInterval = null;
+        let isTimerPaused = false;
+
         window.onload = () => {
             if (window.originalQuizData && window.originalQuizData.length > 0) {
                 allQuestions = window.originalQuizData;
@@ -172,6 +208,48 @@
                 document.getElementById('question-text').innerText = "請在程式碼最後方的 array 中匯入題庫資料。";
             }
         };
+
+        // --- 計時器邏輯 ---
+        function startTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                if (!isTimerPaused) {
+                    timeRemaining--;
+                    updateTimerDisplay();
+                    if (timeRemaining <= 0) {
+                        clearInterval(timerInterval);
+                        showSummary(); // 時間到自動結束
+                        alert("計時結束！");
+                    }
+                }
+            }, 1000);
+        }
+
+        function toggleTimer() {
+            isTimerPaused = !isTimerPaused;
+            const overlay = document.getElementById('pause-overlay');
+            const icon = document.getElementById('timer-icon');
+            const statusText = document.getElementById('timer-status-text');
+            
+            if (isTimerPaused) {
+                overlay.classList.remove('hidden');
+                // 顯示「開始」文字與圖示
+                statusText.innerText = "開始";
+                icon.innerHTML = `<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path>`;
+            } else {
+                overlay.classList.add('hidden');
+                // 顯示「暫停」文字與圖示
+                statusText.innerText = "暫停";
+                icon.innerHTML = `<path d="M10 18a8 8 0 100-16 8 8 0 000 16zM8 7a1 1 0 00-1-1H7a1 1 0 00-1 1v6a1 1 0 001 1h1a1 1 0 001-1V7zM13 7a1 1 0 00-1-1h-1a1 1 0 00-1 1v6a1 1 0 001 1h1a1 1 0 001-1V7z"></path>`;
+            }
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeRemaining / 60);
+            const seconds = timeRemaining % 60;
+            document.getElementById('timer-text').innerText = 
+                `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
 
         // --- 存檔與回復邏輯 ---
         function checkProgress() {
@@ -192,36 +270,37 @@
             currentQuestionIndex = savedData.questionIndex || 0;
             score = savedData.score || 0;
             answeredTotal = savedData.answeredTotal || 0;
+            timeRemaining = savedData.timeRemaining !== undefined ? savedData.timeRemaining : DEFAULT_TIME_LIMIT;
 
             if (isWrongBookMode) {
                 enterWrongBookMode(true);
             } else {
                 initQuiz(currentGroupIndex, false, true);
             }
+            updateTimerDisplay();
         }
 
         function saveCurrentProgress() {
-            if (currentQuestionIndex >= currentQuizData.length) {
-                localStorage.removeItem(LOCAL_STORAGE_KEY_PROGRESS);
-                return;
-            }
             const saveData = {
                 mode: isWrongBookMode ? 'wrong' : 'normal',
                 groupIndex: currentGroupIndex,
                 questionIndex: currentQuestionIndex,
                 score: score,
                 answeredTotal: answeredTotal,
+                timeRemaining: timeRemaining,
                 timestamp: new Date().getTime()
             };
             localStorage.setItem(LOCAL_STORAGE_KEY_PROGRESS, JSON.stringify(saveData));
+            
             const status = document.getElementById('save-status');
             status.style.opacity = '1';
-            setTimeout(() => { status.style.opacity = '0'; }, 1200);
+            setTimeout(() => { status.style.opacity = '0'; }, 2000);
         }
 
         function clearProgressData() {
             localStorage.removeItem(LOCAL_STORAGE_KEY_PROGRESS);
             document.getElementById('restore-banner').classList.add('hidden');
+            timeRemaining = DEFAULT_TIME_LIMIT;
             initQuiz(0);
         }
 
@@ -247,7 +326,6 @@
         }
 
         function jumpToGroup(index) {
-            localStorage.removeItem(LOCAL_STORAGE_KEY_PROGRESS);
             initQuiz(parseInt(index));
         }
 
@@ -257,13 +335,19 @@
             currentQuizData = shouldShuffle ? shuffle([...groupedQuestions[groupIndex]]) : [...groupedQuestions[groupIndex]];
             document.getElementById('group-selector').value = groupIndex;
             document.getElementById('set-label').innerText = `Group ${groupIndex + 1}`;
-            if (!isRestoring) resetSessionStats();
-            else {
+            
+            if (!isRestoring) {
+                resetSessionStats();
+                timeRemaining = DEFAULT_TIME_LIMIT;
+            } else {
                 document.getElementById('quiz-container').classList.remove('hidden');
                 document.getElementById('result-screen').classList.add('hidden');
             }
+            
             loadQuestion();
             updateProgress();
+            updateTimerDisplay();
+            startTimer();
         }
 
         function resetSessionStats() {
@@ -272,10 +356,12 @@
             answeredTotal = 0;
             isAnswered = false;
             wrongQuestionsInThisRound = [];
+            isTimerPaused = false;
             document.getElementById('quiz-container').classList.remove('hidden');
             document.getElementById('result-screen').classList.add('hidden');
             document.getElementById('next-btn').innerHTML = '<span>下一題</span>';
-            saveCurrentProgress();
+            document.getElementById('pause-overlay').classList.add('hidden');
+            document.getElementById('timer-status-text').innerText = "暫停";
         }
 
         function shuffle(array) {
@@ -322,7 +408,7 @@
         }
 
         function checkAnswer(selectedKey, clickedBtn) {
-            if (isAnswered) return;
+            if (isAnswered || isTimerPaused) return; 
             isAnswered = true;
             answeredTotal++;
             const q = currentQuizData[currentQuestionIndex];
@@ -349,7 +435,6 @@
             if (currentQuestionIndex === currentQuizData.length - 1) {
                 document.getElementById('next-btn').innerHTML = '<span>查看練習總結</span>';
             }
-            saveCurrentProgress();
         }
 
         // --- 錯題本與輔助功能 ---
@@ -392,10 +477,10 @@
             else { document.getElementById('quiz-container').classList.remove('hidden'); document.getElementById('result-screen').classList.add('hidden'); }
             loadQuestion();
             updateProgress();
+            startTimer();
         }
         function exitToNormal() {
             isWrongBookMode = false;
-            localStorage.removeItem(LOCAL_STORAGE_KEY_PROGRESS);
             document.getElementById('mode-tag').innerText = "一般練習模式";
             document.getElementById('mode-tag').classList.replace('text-red-500', 'text-gray-400');
             document.getElementById('wrong-book-btn').innerHTML = `錯題本 (<span id="wrong-count">${getSavedWrongIds().length}</span>)`;
@@ -404,7 +489,7 @@
         }
 
         function showSummary() {
-            localStorage.removeItem(LOCAL_STORAGE_KEY_PROGRESS);
+            clearInterval(timerInterval);
             document.getElementById('quiz-container').classList.add('hidden');
             document.getElementById('result-screen').classList.remove('hidden');
             document.getElementById('final-score-text').innerText = `${score} / ${currentQuizData.length}`;
@@ -432,13 +517,16 @@
             isRandomMode = shouldShuffle;
             currentQuizData = shouldShuffle ? shuffle([...currentQuizData]) : [...currentQuizData];
             resetSessionStats();
+            timeRemaining = DEFAULT_TIME_LIMIT;
             loadQuestion();
             updateProgress();
+            updateTimerDisplay();
+            startTimer();
         }
 
         document.getElementById('next-btn').onclick = () => {
             currentQuestionIndex++;
-            if (currentQuestionIndex < currentQuizData.length) { loadQuestion(); saveCurrentProgress(); }
+            if (currentQuestionIndex < currentQuizData.length) { loadQuestion(); }
             else showSummary();
         };
 
