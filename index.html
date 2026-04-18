@@ -37,7 +37,6 @@
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        /* 錯題模式專用樣式 */
         .wrong-mode-bg {
             background-color: #fef2f2 !important;
         }
@@ -50,7 +49,7 @@
         <div id="header-bar" class="bg-indigo-600 p-6 text-white relative transition-colors duration-500">
             <!-- 恢復進度 Banner -->
             <div id="restore-banner" class="hidden absolute inset-0 bg-slate-900/95 z-30 flex flex-col items-center justify-center p-4 text-center">
-                <p class="mb-4 text-sm font-medium">偵測到上次手動儲存的進度，是否繼續？</p>
+                <p class="mb-4 text-sm font-medium">偵測到上次儲存的進度，是否繼續？</p>
                 <div class="flex space-x-3">
                     <button onclick="restoreProgress()" class="bg-yellow-400 hover:bg-yellow-500 text-indigo-900 px-4 py-2 rounded-xl font-bold text-xs transition-all">載入進度</button>
                     <button onclick="fullSystemReset()" class="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-xl font-bold text-xs transition-all">重新開始</button>
@@ -59,6 +58,7 @@
 
             <div class="flex justify-between items-start mb-4">
                 <div class="flex flex-col items-start space-y-2">
+                    <!-- Reset 功能靠左 -->
                     <button onclick="confirmFullReset()" class="bg-white/10 hover:bg-red-500 text-white text-[10px] py-1 px-2 rounded-md transition-colors flex items-center space-x-1">
                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                         <span>系統全重置</span>
@@ -69,10 +69,9 @@
                 <div class="text-right flex flex-col items-end space-y-2">
                     <div id="timer-display" class="bg-black/20 px-3 py-1.5 rounded-lg flex items-center space-x-2">
                         <span class="text-[10px] opacity-80">剩餘時間</span>
-                        <span id="timer-text" class="text-lg font-mono font-bold text-yellow-400">100:00</span>
+                        <span id="timer-text" class="text-lg font-mono font-bold text-yellow-400">153:00</span>
                         <button onclick="toggleTimer()" id="timer-control-btn" class="bg-white/20 hover:bg-white/30 px-2 py-1 rounded flex items-center space-x-1 transition-colors">
                             <svg id="timer-icon" class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zM8 7a1 1 0 00-1-1H7a1 1 0 00-1 1v6a1 1 0 001 1h1a1 1 0 001-1V7zM13 7a1 1 0 00-1-1h-1a1 1 0 00-1 1v6a1 1 0 001 1h1a1 1 0 001-1V7z"></path></svg>
-                            <span id="timer-status-text" class="text-[10px] font-bold">暫停</span>
                         </button>
                     </div>
                     <div id="score-counter">
@@ -87,12 +86,12 @@
             </div>
             
             <div class="flex justify-between mt-2 items-center">
-                <p id="progress-text" class="text-[10px] opacity-80 uppercase tracking-widest font-medium">準備中...</p>
+                <p id="progress-text" class="text-[10px] opacity-80 uppercase tracking-widest font-medium">分組載入中...</p>
                 <div class="flex space-x-2">
                     <button onclick="saveCurrentProgress()" class="bg-blue-500 hover:bg-blue-600 text-white text-[10px] rounded px-2 py-1 transition-colors flex items-center space-x-1">
-                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
                         <span>手動存檔</span>
                     </button>
+                    <!-- Reset 錯題本按鈕 -->
                     <button id="reset-wrong-btn" onclick="confirmResetWrong()" class="hidden bg-orange-500 hover:bg-orange-600 text-white text-[10px] rounded px-2 py-1 transition-colors">
                         清空錯題本
                     </button>
@@ -106,102 +105,72 @@
         </div>
 
         <!-- Quiz Area -->
-        <div id="quiz-container" class="p-6 md:p-10 relative">
+        <div id="quiz-container" class="p-6 md:p-10 relative min-h-[400px]">
             <div id="pause-overlay" class="hidden absolute inset-0 bg-white/95 z-10 flex flex-col items-center justify-center backdrop-blur-md">
-                <div class="bg-indigo-50 p-8 rounded-3xl border-2 border-indigo-100 text-center shadow-xl">
-                    <div id="pause-icon-circle" class="w-16 h-16 bg-indigo-600 text-white rounded-full flex items-center justify-center mx-auto mb-4">
-                        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
-                    </div>
-                    <h3 class="text-2xl font-black text-indigo-900 mb-2">測驗暫停中</h3>
-                    <p class="text-indigo-600/70 text-sm mb-6">計時已停止，點擊下方按鈕繼續</p>
-                    <button onclick="toggleTimer()" id="resume-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-2xl font-bold shadow-lg transition-all active:scale-95">恢復測驗</button>
-                </div>
+                <h3 class="text-2xl font-black text-indigo-900 mb-2">測驗暫停中</h3>
+                <button onclick="toggleTimer()" class="bg-indigo-600 text-white px-8 py-3 rounded-2xl font-bold">恢復測驗</button>
             </div>
 
             <div id="question-box" class="fade-in">
                 <div class="flex items-center justify-between mb-4">
-                    <span id="question-id-tag" class="bg-indigo-100 text-indigo-700 text-xs font-bold px-2.5 py-1 rounded-full">Question</span>
-                    <div class="flex items-center space-x-2">
-                        <span id="save-status" class="text-[9px] text-green-500 opacity-0 transition-opacity font-bold">進度已儲存</span>
-                        <span id="mode-tag" class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">一般練習模式</span>
-                    </div>
+                    <span id="question-id-tag" class="text-xs font-bold px-2.5 py-1 rounded-full">#題號</span>
+                    <span id="mode-tag" class="text-[10px] font-bold text-gray-400 uppercase">一般練習模式</span>
                 </div>
-                <h2 id="question-text" class="text-lg md:text-xl font-medium text-gray-800 mb-8 leading-relaxed">載入中...</h2>
+                <h2 id="question-text" class="text-lg md:text-xl font-medium text-gray-800 mb-8 leading-relaxed">載入題目中...</h2>
                 <div id="options-container" class="space-y-4"></div>
             </div>
 
-            <!-- Feedback -->
             <div id="feedback-area" class="mt-8 hidden">
-                <div id="feedback-message" class="p-4 rounded-2xl mb-4 font-medium flex items-center space-x-3 text-sm"></div>
-                <button id="next-btn" class="w-full bg-gray-900 hover:bg-black text-white font-bold py-4 rounded-2xl shadow-xl transition-all active:scale-95 flex justify-center items-center space-x-2">
+                <div id="feedback-message" class="p-4 rounded-2xl mb-4 font-medium text-sm"></div>
+                <button id="next-btn" class="w-full bg-gray-900 hover:bg-black text-white font-bold py-4 rounded-2xl transition-all flex justify-center items-center space-x-2">
                     <span>下一題</span>
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
                 </button>
             </div>
         </div>
 
         <!-- Result Screen -->
         <div id="result-screen" class="p-8 md:p-10 hidden text-center fade-in">
-            <div class="w-20 h-20 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <svg class="w-10 h-10 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-            </div>
-            <h2 class="text-3xl font-extrabold text-gray-900 mb-2">練習結束</h2>
-            <p class="text-gray-500 mb-6" id="result-subtitle">太棒了！您已經完成此階段練習。</p>
-            
+            <h2 class="text-3xl font-extrabold text-gray-900 mb-6">練習結束</h2>
             <div class="grid grid-cols-2 gap-4 mb-6">
                 <div class="bg-slate-50 p-4 rounded-2xl border border-gray-100">
-                    <span class="block text-gray-400 text-sm mb-1">得分</span>
+                    <span class="block text-gray-400 text-sm">得分</span>
                     <span class="text-2xl font-bold text-indigo-600" id="final-score-text">0/0</span>
                 </div>
                 <div class="bg-slate-50 p-4 rounded-2xl border border-gray-100">
-                    <span class="block text-gray-400 text-sm mb-1">正確率</span>
+                    <span class="block text-gray-400 text-sm">正確率</span>
                     <span class="text-2xl font-bold text-indigo-600" id="final-accuracy-text">0%</span>
                 </div>
             </div>
-
-            <div id="wrong-questions-summary" class="text-left mb-8 bg-red-50 p-4 rounded-2xl border border-red-100 hidden">
-                <h3 class="text-red-800 font-bold mb-2 flex items-center text-sm">本輪答錯題號</h3>
-                <div id="wrong-list" class="flex flex-wrap gap-2 text-sm text-red-600 font-medium"></div>
-            </div>
-
             <div class="space-y-3">
-                <button id="next-group-btn" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-2xl shadow-lg transition-all active:scale-95 hidden">
-                    進入下一組
-                </button>
-                <button onclick="restartCurrentSession(true)" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-2xl shadow-lg transition-all active:scale-95">
-                    本輪亂序重做
-                </button>
-                <button onclick="exitToNormal()" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-4 rounded-2xl transition-all active:scale-95">
-                    回到第一組
-                </button>
+                <button id="next-group-btn" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-2xl hidden">下一組</button>
+                <button onclick="restartCurrentSession(true)" class="w-full bg-indigo-600 text-white font-bold py-4 rounded-2xl">本組亂序重做</button>
+                <button onclick="exitToNormal()" class="w-full bg-gray-100 text-gray-700 font-bold py-4 rounded-2xl">回到首頁</button>
             </div>
         </div>
     </div>
 
-    <!-- 自定義確認對話框 -->
+    <!-- 自定義對話框 -->
     <div id="custom-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
         <div class="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl text-center">
             <h3 id="modal-title" class="text-xl font-bold mb-2">確認操作</h3>
-            <p id="modal-desc" class="text-gray-500 mb-6 text-sm">此動作無法復原，您確定要繼續嗎？</p>
+            <p id="modal-desc" class="text-gray-500 mb-6 text-sm"></p>
             <div class="flex space-x-3">
-                <button onclick="closeModal()" class="flex-1 bg-gray-100 hover:bg-gray-200 py-3 rounded-2xl font-bold text-gray-600 transition-all">取消</button>
-                <button id="modal-confirm-btn" class="flex-1 bg-red-600 hover:bg-red-700 py-3 rounded-2xl font-bold text-white transition-all shadow-lg shadow-red-200">確定重置</button>
+                <button onclick="closeModal()" class="flex-1 bg-gray-100 py-3 rounded-2xl font-bold text-gray-600">取消</button>
+                <button id="modal-confirm-btn" class="flex-1 bg-red-600 py-3 rounded-2xl font-bold text-white shadow-lg">確定</button>
             </div>
         </div>
     </div>
 
     <script>
-        // 常量與全域變數
-        const QUESTIONS_PER_GROUP = 25;
-        const DEFAULT_TIME_LIMIT = 100 * 60; 
-        const LOCAL_STORAGE_KEY_WRONG = 'law_quiz_wrong_ids';
-        const LOCAL_STORAGE_KEY_PROGRESS = 'law_quiz_save_data';
+        // 設定變數
+        const TIME_LIMIT_MINUTES = 153;
+        const BASE_PER_GROUP = 30;
+        const LOCAL_STORAGE_KEY_WRONG = 'law_quiz_wrong_ids_v2';
+        const LOCAL_STORAGE_KEY_PROGRESS = 'law_quiz_save_data_v2';
 
         let allQuestions = [];
         let groupedQuestions = [];
-        let currentQuizData = []; 
+        let currentQuizData = [];
         let currentQuestionIndex = 0;
         let score = 0;
         let answeredTotal = 0;
@@ -209,493 +178,299 @@
         let isRandomMode = false;
         let isWrongBookMode = false;
         let currentGroupIndex = 0;
-        let wrongQuestionsInThisRound = [];
 
-        let timeRemaining = DEFAULT_TIME_LIMIT;
+        let timeRemaining = TIME_LIMIT_MINUTES * 60;
         let timerInterval = null;
         let isTimerPaused = false;
 
         window.onload = () => {
             if (window.originalQuizData && window.originalQuizData.length > 0) {
                 allQuestions = window.originalQuizData;
-                splitIntoGroups();
+                createGroups(); 
                 renderGroupSelector();
                 updateWrongCountDisplay();
                 checkProgress();
-            } else {
-                const qText = document.getElementById('question-text');
-                if (qText) qText.innerText = "請在程式碼最後方的 array 中匯入題庫資料。";
             }
         };
 
+        // --- 分組邏輯：30一組，未滿30併入前一組 ---
+        function createGroups() {
+            groupedQuestions = [];
+            let total = allQuestions.length;
+            let tempGroups = [];
+            
+            // 先按 30 題分
+            for (let i = 0; i < total; i += BASE_PER_GROUP) {
+                tempGroups.push(allQuestions.slice(i, i + BASE_PER_GROUP));
+            }
+
+            // 處理合併邏輯：如果最後一組不足 30 且這不是唯一的一組
+            if (tempGroups.length > 1) {
+                let lastIdx = tempGroups.length - 1;
+                if (tempGroups[lastIdx].length < BASE_PER_GROUP) {
+                    let lastGroup = tempGroups.pop();
+                    tempGroups[tempGroups.length - 1] = tempGroups[tempGroups.length - 1].concat(lastGroup);
+                }
+            }
+            groupedQuestions = tempGroups;
+        }
+
         // --- 重置功能 ---
-        let currentAction = null;
         function showModal(title, desc, onConfirm) {
             document.getElementById('modal-title').innerText = title;
             document.getElementById('modal-desc').innerText = desc;
             document.getElementById('modal-confirm-btn').onclick = onConfirm;
             document.getElementById('custom-modal').classList.remove('hidden');
         }
-        function closeModal() {
-            document.getElementById('custom-modal').classList.add('hidden');
-        }
+        function closeModal() { document.getElementById('custom-modal').classList.add('hidden'); }
 
         function confirmFullReset() {
-            showModal("系統全重置", "這將會清除您的所有存檔、錯題紀錄並重新開始。確定嗎？", fullSystemReset);
-        }
-
-        function fullSystemReset() {
-            localStorage.removeItem(LOCAL_STORAGE_KEY_PROGRESS);
-            localStorage.removeItem(LOCAL_STORAGE_KEY_WRONG);
-            closeModal();
-            location.reload(); // 重新整理頁面是最乾淨的重置方式
+            showModal("全系統重置", "將清除所有存檔與錯題本，確定嗎？", () => {
+                localStorage.removeItem(LOCAL_STORAGE_KEY_PROGRESS);
+                localStorage.removeItem(LOCAL_STORAGE_KEY_WRONG);
+                location.reload();
+            });
         }
 
         function confirmResetWrong() {
-            showModal("清空錯題本", "這將會永久刪除您所有的錯題紀錄。確定嗎？", resetWrongBookOnly);
+            showModal("重置錯題本", "將清除所有紀錄的錯題，確定嗎？", () => {
+                localStorage.removeItem(LOCAL_STORAGE_KEY_WRONG);
+                updateWrongCountDisplay();
+                closeModal();
+                if (isWrongBookMode) exitToNormal();
+            });
         }
 
-        function resetWrongBookOnly() {
-            localStorage.removeItem(LOCAL_STORAGE_KEY_WRONG);
-            updateWrongCountDisplay();
-            closeModal();
-            if (isWrongBookMode) {
-                exitToNormal();
-            }
-        }
-
-        // --- 計時器邏輯 ---
+        // --- 計時與進度 ---
         function startTimer() {
             if (timerInterval) clearInterval(timerInterval);
             timerInterval = setInterval(() => {
                 if (!isTimerPaused) {
                     timeRemaining--;
                     updateTimerDisplay();
-                    if (timeRemaining <= 0) {
-                        clearInterval(timerInterval);
-                        showSummary();
-                    }
+                    if (timeRemaining <= 0) { clearInterval(timerInterval); showSummary(); }
                 }
             }, 1000);
         }
 
         function toggleTimer() {
             isTimerPaused = !isTimerPaused;
-            const overlay = document.getElementById('pause-overlay');
-            const icon = document.getElementById('timer-icon');
-            const statusText = document.getElementById('timer-status-text');
-            
-            if (isTimerPaused) {
-                if (overlay) overlay.classList.remove('hidden');
-                if (statusText) statusText.innerText = "開始";
-                if (icon) icon.innerHTML = `<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path>`;
-            } else {
-                if (overlay) overlay.classList.add('hidden');
-                if (statusText) statusText.innerText = "暫停";
-                if (icon) icon.innerHTML = `<path d="M10 18a8 8 0 100-16 8 8 0 000 16zM8 7a1 1 0 00-1-1H7a1 1 0 00-1 1v6a1 1 0 001 1h1a1 1 0 001-1V7zM13 7a1 1 0 00-1-1h-1a1 1 0 00-1 1v6a1 1 0 001 1h1a1 1 0 001-1V7z"></path>`;
-            }
+            document.getElementById('pause-overlay').classList.toggle('hidden', !isTimerPaused);
         }
 
         function updateTimerDisplay() {
             const display = document.getElementById('timer-text');
-            if (!display) return;
-            const minutes = Math.floor(timeRemaining / 60);
-            const seconds = timeRemaining % 60;
-            display.innerText = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            const m = Math.floor(timeRemaining / 60);
+            const s = timeRemaining % 60;
+            display.innerText = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
         }
 
-        // --- 存檔與回復 ---
         function checkProgress() {
-            const savedData = localStorage.getItem(LOCAL_STORAGE_KEY_PROGRESS);
-            const banner = document.getElementById('restore-banner');
-            if (savedData && banner) {
-                banner.classList.remove('hidden');
-            } else {
-                initQuiz(0);
-            }
+            const saved = localStorage.getItem(LOCAL_STORAGE_KEY_PROGRESS);
+            if (saved) { document.getElementById('restore-banner').classList.remove('hidden'); }
+            else { initQuiz(0); }
         }
 
         function restoreProgress() {
-            const savedRaw = localStorage.getItem(LOCAL_STORAGE_KEY_PROGRESS);
-            if (!savedRaw) return;
-            const savedData = JSON.parse(savedRaw);
-            const banner = document.getElementById('restore-banner');
-            if (banner) banner.classList.add('hidden');
+            const saved = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_PROGRESS));
+            document.getElementById('restore-banner').classList.add('hidden');
+            isWrongBookMode = saved.mode === 'wrong';
+            currentGroupIndex = saved.groupIndex || 0;
+            currentQuestionIndex = saved.questionIndex || 0;
+            score = saved.score || 0;
+            answeredTotal = saved.answeredTotal || 0;
+            timeRemaining = saved.timeRemaining || (TIME_LIMIT_MINUTES * 60);
             
-            isWrongBookMode = savedData.mode === 'wrong';
-            currentGroupIndex = savedData.groupIndex || 0;
-            currentQuestionIndex = savedData.questionIndex || 0;
-            score = savedData.score || 0;
-            answeredTotal = savedData.answeredTotal || 0;
-            timeRemaining = savedData.timeRemaining !== undefined ? savedData.timeRemaining : DEFAULT_TIME_LIMIT;
-
-            if (isWrongBookMode) {
-                enterWrongBookMode(true);
-            } else {
-                initQuiz(currentGroupIndex, false, true);
-            }
-            updateTimerDisplay();
+            if (isWrongBookMode) enterWrongBookMode(true);
+            else initQuiz(currentGroupIndex, false, true);
         }
 
         function saveCurrentProgress() {
-            const saveData = {
+            const data = {
                 mode: isWrongBookMode ? 'wrong' : 'normal',
                 groupIndex: currentGroupIndex,
                 questionIndex: currentQuestionIndex,
                 score: score,
                 answeredTotal: answeredTotal,
-                timeRemaining: timeRemaining,
-                timestamp: new Date().getTime()
+                timeRemaining: timeRemaining
             };
-            localStorage.setItem(LOCAL_STORAGE_KEY_PROGRESS, JSON.stringify(saveData));
-            const status = document.getElementById('save-status');
-            if (status) {
-                status.style.opacity = '1';
-                setTimeout(() => { status.style.opacity = '0'; }, 2000);
-            }
+            localStorage.setItem(LOCAL_STORAGE_KEY_PROGRESS, JSON.stringify(data));
         }
 
-        // --- 核心邏輯 ---
-        function splitIntoGroups() {
-            groupedQuestions = [];
-            for (let i = 0; i < allQuestions.length; i += QUESTIONS_PER_GROUP) {
-                groupedQuestions.push(allQuestions.slice(i, i + QUESTIONS_PER_GROUP));
-            }
-        }
-
+        // --- 核心測驗流程 ---
         function renderGroupSelector() {
-            const selector = document.getElementById('group-selector');
-            if (!selector) return;
-            selector.innerHTML = '';
-            groupedQuestions.forEach((group, index) => {
-                const option = document.createElement('option');
-                option.value = index;
-                const start = index * QUESTIONS_PER_GROUP + 1;
-                const end = Math.min((index + 1) * QUESTIONS_PER_GROUP, allQuestions.length);
-                option.innerText = `組別 ${index + 1} (${start}-${end})`;
-                selector.appendChild(option);
+            const sel = document.getElementById('group-selector');
+            sel.innerHTML = '';
+            groupedQuestions.forEach((group, i) => {
+                const opt = document.createElement('option');
+                opt.value = i;
+                opt.innerText = `組別 ${i+1} (${group.length} 題)`;
+                sel.appendChild(opt);
             });
         }
 
-        function jumpToGroup(index) {
-            initQuiz(parseInt(index));
-        }
+        function jumpToGroup(idx) { initQuiz(parseInt(idx)); }
 
-        function initQuiz(groupIndex, shouldShuffle = false, isRestoring = false) {
-            currentGroupIndex = groupIndex;
+        function initQuiz(idx, shouldShuffle = false, isRestoring = false) {
+            currentGroupIndex = idx;
             isRandomMode = shouldShuffle;
-            currentQuizData = shouldShuffle ? shuffle([...groupedQuestions[groupIndex]]) : [...groupedQuestions[groupIndex]];
+            currentQuizData = shouldShuffle ? shuffle([...groupedQuestions[idx]]) : [...groupedQuestions[idx]];
             
-            const selector = document.getElementById('group-selector');
-            if (selector) selector.value = groupIndex;
-            
-            const label = document.getElementById('set-label');
-            if (label) label.innerText = `Group ${groupIndex + 1}`;
+            document.getElementById('group-selector').value = idx;
+            document.getElementById('set-label').innerText = `Group ${idx + 1}`;
             
             if (!isRestoring) {
-                resetSessionStats();
-                timeRemaining = DEFAULT_TIME_LIMIT;
-            } else {
-                const quizC = document.getElementById('quiz-container');
-                const resultS = document.getElementById('result-screen');
-                if (quizC) quizC.classList.remove('hidden');
-                if (resultS) resultS.classList.add('hidden');
+                currentQuestionIndex = 0; score = 0; answeredTotal = 0;
+                timeRemaining = TIME_LIMIT_MINUTES * 60;
             }
             
+            document.getElementById('quiz-container').classList.remove('hidden');
+            document.getElementById('result-screen').classList.add('hidden');
             loadQuestion();
             updateProgress();
-            updateTimerDisplay();
             startTimer();
-        }
-
-        function resetSessionStats() {
-            currentQuestionIndex = 0;
-            score = 0;
-            answeredTotal = 0;
-            isAnswered = false;
-            wrongQuestionsInThisRound = [];
-            isTimerPaused = false;
-            
-            const quizC = document.getElementById('quiz-container');
-            const resultS = document.getElementById('result-screen');
-            const nextBtn = document.getElementById('next-btn');
-            const overlay = document.getElementById('pause-overlay');
-            const statusText = document.getElementById('timer-status-text');
-
-            if (quizC) quizC.classList.remove('hidden');
-            if (resultS) resultS.classList.add('hidden');
-            if (nextBtn) nextBtn.innerHTML = '<span>下一題</span>';
-            if (overlay) overlay.classList.add('hidden');
-            if (statusText) statusText.innerText = "暫停";
-        }
-
-        function shuffle(array) {
-            const newArr = [...array];
-            for (let i = newArr.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [newArr[i], newArr[j]] = [newArr[j], newArr[i]];
-            }
-            return newArr;
-        }
-
-        function updateProgress() {
-            const progressBar = document.getElementById('progress-bar');
-            const progressText = document.getElementById('progress-text');
-            const liveAcc = document.getElementById('live-accuracy');
-
-            if (progressBar) {
-                const progress = currentQuizData.length > 0 ? (currentQuestionIndex / currentQuizData.length) * 100 : 0;
-                progressBar.style.width = `${progress}%`;
-            }
-            if (progressText) {
-                progressText.innerText = `進度: ${currentQuestionIndex + 1} / ${currentQuizData.length}`;
-            }
-            if (liveAcc) {
-                const accuracy = answeredTotal === 0 ? 0 : Math.round((score / answeredTotal) * 100);
-                liveAcc.innerText = `${accuracy}%`;
-            }
         }
 
         function loadQuestion() {
             if (!currentQuizData[currentQuestionIndex]) return;
             isAnswered = false;
             const q = currentQuizData[currentQuestionIndex];
-            
             const idTag = document.getElementById('question-id-tag');
-            const qText = document.getElementById('question-text');
+            
+            if (isWrongBookMode) {
+                idTag.innerText = `#錯題題號 ${q.id}`;
+                idTag.className = 'text-xs font-bold px-2.5 py-1 rounded-full bg-red-100 text-red-700';
+            } else {
+                idTag.innerText = `#題號 ${q.id}`;
+                idTag.className = 'text-xs font-bold px-2.5 py-1 rounded-full bg-indigo-100 text-indigo-700';
+            }
+
+            document.getElementById('question-text').innerText = q.question;
             const container = document.getElementById('options-container');
-            const feedback = document.getElementById('feedback-area');
-
-            if (idTag) {
-                if (isWrongBookMode) {
-                    idTag.innerText = `#錯題題號 ${q.id}`;
-                    idTag.className = 'bg-red-100 text-red-700 text-xs font-bold px-2.5 py-1 rounded-full';
-                } else {
-                    idTag.innerText = `題號 #${q.id}`;
-                    idTag.className = 'bg-indigo-100 text-indigo-700 text-xs font-bold px-2.5 py-1 rounded-full';
-                }
-            }
-
-            if (qText) qText.innerText = q.question;
-            if (container) {
-                container.innerHTML = '';
-                let optionEntries = Object.entries(q.options);
-                if (isRandomMode) optionEntries = shuffle(optionEntries);
-                const labelChars = ['A', 'B', 'C', 'D', 'E'];
-                optionEntries.forEach((entry, index) => {
-                    const [key, val] = entry;
-                    const btn = document.createElement('button');
-                    btn.className = 'option-card w-full text-left p-4 rounded-2xl border-2 border-gray-100 bg-white hover:border-indigo-200 hover:bg-indigo-50 transition-all flex items-start group shadow-sm';
-                    btn.innerHTML = `
-                        <span class="flex-shrink-0 w-8 h-8 rounded-lg bg-gray-100 group-hover:bg-indigo-600 group-hover:text-white text-gray-500 flex items-center justify-center font-bold text-sm mr-4 transition-colors">${labelChars[index] || index}</span>
-                        <span class="text-gray-700 pt-1 text-sm md:text-base">${val}</span>
-                    `;
-                    btn.onclick = () => checkAnswer(key, btn);
-                    btn.dataset.key = key;
-                    container.appendChild(btn);
-                });
-            }
-            if (feedback) feedback.classList.add('hidden');
+            container.innerHTML = '';
+            
+            Object.entries(q.options).forEach(([key, val]) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-card w-full text-left p-4 rounded-2xl border-2 border-gray-100 bg-white flex items-start shadow-sm';
+                btn.innerHTML = `<span class="font-bold mr-4 text-indigo-600">${key}.</span><span class="text-gray-700">${val}</span>`;
+                btn.onclick = () => checkAnswer(key, btn);
+                btn.dataset.key = key;
+                container.appendChild(btn);
+            });
+            document.getElementById('feedback-area').classList.add('hidden');
             updateProgress();
         }
 
-        function checkAnswer(selectedKey, clickedBtn) {
-            if (isAnswered || isTimerPaused) return; 
+        function checkAnswer(key, btn) {
+            if (isAnswered) return;
             isAnswered = true;
             answeredTotal++;
             const q = currentQuizData[currentQuestionIndex];
             const correctKey = q.answer;
-            const buttons = document.querySelectorAll('.option-card');
             
-            buttons.forEach(b => {
+            document.querySelectorAll('.option-card').forEach(b => {
                 if (b.dataset.key === correctKey) b.classList.add('correct');
-                else if (b.dataset.key === selectedKey) b.classList.add('wrong');
-                b.style.cursor = 'default';
+                else if (b.dataset.key === key) b.classList.add('wrong');
             });
 
-            const feedbackArea = document.getElementById('feedback-area');
-            const feedbackMsg = document.getElementById('feedback-message');
-            const nextBtn = document.getElementById('next-btn');
-
-            if (feedbackArea) feedbackArea.classList.remove('hidden');
-            
-            if (selectedKey === correctKey) {
+            if (key === correctKey) {
                 score++;
-                if (feedbackMsg) {
-                    feedbackMsg.className = 'p-4 rounded-2xl mb-4 font-bold bg-green-50 text-green-700 border border-green-200';
-                    feedbackMsg.innerHTML = "正確解答！";
-                }
-                if (isWrongBookMode) removeWrongId(q.id);
+                if (isWrongBookMode) removeFromWrong(q.id);
             } else {
-                wrongQuestionsInThisRound.push(q.id);
-                saveWrongId(q.id); 
-                if (feedbackMsg) {
-                    feedbackMsg.className = 'p-4 rounded-2xl mb-4 font-bold bg-red-50 text-red-700 border border-red-200';
-                    feedbackMsg.innerHTML = `答錯了。正確答案：${q.options[correctKey]}`;
-                }
+                saveToWrong(q.id);
             }
-
-            if (nextBtn && currentQuestionIndex === currentQuizData.length - 1) {
-                nextBtn.innerHTML = '<span>查看練習總結</span>';
-            }
+            
+            document.getElementById('feedback-area').classList.remove('hidden');
+            document.getElementById('feedback-message').innerText = key === correctKey ? "正確！" : `錯誤，正確答案是 ${correctKey}`;
         }
 
-        // --- 錯題與存儲 ---
-        function getSavedWrongIds() {
-            const saved = localStorage.getItem(LOCAL_STORAGE_KEY_WRONG);
-            return saved ? JSON.parse(saved) : [];
+        function updateProgress() {
+            const perc = (currentQuestionIndex / currentQuizData.length) * 100;
+            document.getElementById('progress-bar').style.width = `${perc}%`;
+            document.getElementById('progress-text').innerText = `進度: ${currentQuestionIndex + 1} / ${currentQuizData.length}`;
+            const acc = answeredTotal === 0 ? 0 : Math.round((score / answeredTotal) * 100);
+            document.getElementById('live-accuracy').innerText = `${acc}%`;
         }
 
-        function saveWrongId(id) {
-            let ids = getSavedWrongIds();
-            if (!ids.includes(id)) { 
-                ids.push(id); 
-                localStorage.setItem(LOCAL_STORAGE_KEY_WRONG, JSON.stringify(ids)); 
+        // --- 錯題本邏輯 ---
+        function saveToWrong(id) {
+            let ids = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WRONG) || '[]');
+            if (!ids.includes(id)) {
+                ids.push(id);
+                localStorage.setItem(LOCAL_STORAGE_KEY_WRONG, JSON.stringify(ids));
             }
             updateWrongCountDisplay();
         }
-
-        function removeWrongId(id) {
-            let ids = getSavedWrongIds();
-            ids = ids.filter(item => item !== id);
+        function removeFromWrong(id) {
+            let ids = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WRONG) || '[]');
+            ids = ids.filter(x => x !== id);
             localStorage.setItem(LOCAL_STORAGE_KEY_WRONG, JSON.stringify(ids));
             updateWrongCountDisplay();
         }
-
         function updateWrongCountDisplay() {
-            const countEl = document.getElementById('wrong-count');
-            if (countEl) {
-                countEl.innerText = getSavedWrongIds().length;
-            }
+            document.getElementById('wrong-count').innerText = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WRONG) || '[]').length;
         }
 
-        function toggleWrongBook() {
-            if (isWrongBookMode) {
-                exitToNormal();
-            } else {
-                if (getSavedWrongIds().length === 0) { 
-                    alert("目前沒有錯題紀錄！"); 
-                    return; 
-                }
-                enterWrongBookMode();
-            }
-        }
-
-        function enterWrongBookMode(isRestoring = false) {
+        function enterWrongBookMode(restoring = false) {
+            const wrongIds = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WRONG) || '[]');
+            if (wrongIds.length === 0) return alert("尚無錯題紀錄");
+            
             isWrongBookMode = true;
-            const wrongIds = getSavedWrongIds();
             currentQuizData = allQuestions.filter(q => wrongIds.includes(q.id));
             
-            // 視覺切換
-            document.getElementById('header-bar').classList.replace('bg-indigo-600', 'bg-red-700');
+            document.getElementById('header-bar').className = 'bg-red-700 p-6 text-white relative transition-colors';
             document.getElementById('body-bg').classList.add('wrong-mode-bg');
             document.getElementById('reset-wrong-btn').classList.remove('hidden');
+            document.getElementById('mode-tag').innerText = "錯題複習模式";
+            document.getElementById('mode-tag').classList.replace('text-gray-400', 'text-red-500');
+            document.getElementById('wrong-book-btn').innerText = "退出模式";
             
-            const modeTag = document.getElementById('mode-tag');
-            const wbBtn = document.getElementById('wrong-book-btn');
-            const grpSel = document.getElementById('group-selector');
-            const setLabel = document.getElementById('set-label');
-
-            if (modeTag) {
-                modeTag.innerText = "錯題複習模式";
-                modeTag.classList.replace('text-gray-400', 'text-red-500');
-            }
-            if (wbBtn) wbBtn.innerText = "退出";
-            if (grpSel) grpSel.style.display = 'none';
-            if (setLabel) setLabel.innerText = "Wrong Book";
-            
-            if (!isRestoring) resetSessionStats();
+            if (!restoring) { currentQuestionIndex = 0; score = 0; answeredTotal = 0; }
             loadQuestion();
-            updateProgress();
             startTimer();
         }
 
         function exitToNormal() {
             isWrongBookMode = false;
-            
-            // 視覺切換回正
-            document.getElementById('header-bar').classList.replace('bg-red-700', 'bg-indigo-600');
+            document.getElementById('header-bar').className = 'bg-indigo-600 p-6 text-white relative transition-colors';
             document.getElementById('body-bg').classList.remove('wrong-mode-bg');
             document.getElementById('reset-wrong-btn').classList.add('hidden');
-
-            const modeTag = document.getElementById('mode-tag');
-            const wbBtn = document.getElementById('wrong-book-btn');
-            const grpSel = document.getElementById('group-selector');
-
-            if (modeTag) {
-                modeTag.innerText = "一般練習模式";
-                modeTag.classList.replace('text-red-500', 'text-gray-400');
-            }
-            if (wbBtn) {
-                wbBtn.innerHTML = `錯題本 (<span id="wrong-count">${getSavedWrongIds().length}</span>)`;
-            }
-            if (grpSel) grpSel.style.display = 'inline-block';
-            
+            document.getElementById('mode-tag').innerText = "一般練習模式";
+            document.getElementById('mode-tag').className = "text-[10px] font-bold text-gray-400 uppercase";
+            updateWrongCountDisplay();
             initQuiz(currentGroupIndex);
         }
 
+        function toggleWrongBook() { isWrongBookMode ? exitToNormal() : enterWrongBookMode(); }
+
         function showSummary() {
-            if (timerInterval) clearInterval(timerInterval);
-            const quizC = document.getElementById('quiz-container');
-            const resultS = document.getElementById('result-screen');
-            const fScore = document.getElementById('final-score-text');
-            const fAcc = document.getElementById('final-accuracy-text');
-
-            if (quizC) quizC.classList.add('hidden');
-            if (resultS) resultS.classList.remove('hidden');
-            if (fScore) fScore.innerText = `${score} / ${currentQuizData.length}`;
-            if (fAcc) fAcc.innerText = `${currentQuizData.length > 0 ? Math.round((score/currentQuizData.length)*100) : 0}%`;
+            clearInterval(timerInterval);
+            document.getElementById('quiz-container').classList.add('hidden');
+            document.getElementById('result-screen').classList.remove('hidden');
+            document.getElementById('final-score-text').innerText = `${score} / ${currentQuizData.length}`;
+            document.getElementById('final-accuracy-text').innerText = `${Math.round((score/currentQuizData.length)*100)}%`;
             
-            const nextGroupBtn = document.getElementById('next-group-btn');
-            if (nextGroupBtn) {
-                if (!isWrongBookMode && currentGroupIndex < groupedQuestions.length - 1) {
-                    nextGroupBtn.classList.remove('hidden');
-                    nextGroupBtn.onclick = () => initQuiz(currentGroupIndex + 1);
-                } else {
-                    nextGroupBtn.classList.add('hidden');
-                }
+            const nxt = document.getElementById('next-group-btn');
+            if (!isWrongBookMode && currentGroupIndex < groupedQuestions.length - 1) {
+                nxt.classList.remove('hidden');
+                nxt.onclick = () => initQuiz(currentGroupIndex + 1);
+            } else { nxt.classList.add('hidden'); }
+        }
+
+        function shuffle(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
             }
-
-            const summaryDiv = document.getElementById('wrong-questions-summary');
-            const wrongList = document.getElementById('wrong-list');
-            if (summaryDiv && wrongList) {
-                if (wrongQuestionsInThisRound.length > 0) {
-                    summaryDiv.classList.remove('hidden');
-                    wrongList.innerHTML = '';
-                    wrongQuestionsInThisRound.forEach(id => {
-                        const span = document.createElement('span');
-                        span.className = 'bg-white px-3 py-1 rounded-full border border-red-200 shadow-sm';
-                        span.innerText = `題號 #${id}`;
-                        wrongList.appendChild(span);
-                    });
-                } else {
-                    summaryDiv.classList.add('hidden');
-                }
-            }
+            return arr;
         }
 
-        function restartCurrentSession(shouldShuffle = false) {
-            isRandomMode = shouldShuffle;
-            currentQuizData = shouldShuffle ? shuffle([...currentQuizData]) : [...currentQuizData];
-            resetSessionStats();
-            timeRemaining = DEFAULT_TIME_LIMIT;
-            loadQuestion();
-            updateProgress();
-            updateTimerDisplay();
-            startTimer();
-        }
+        document.getElementById('next-btn').onclick = () => {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < currentQuizData.length) loadQuestion();
+            else showSummary();
+        };
 
-        const nextBtnAction = document.getElementById('next-btn');
-        if (nextBtnAction) {
-            nextBtnAction.onclick = () => {
-                currentQuestionIndex++;
-                if (currentQuestionIndex < currentQuizData.length) { 
-                    loadQuestion(); 
-                } else { 
-                    showSummary(); 
-                }
-            };
-        }
         // ==========================================================
         // 題庫資料區：請在此處替換或增加題目
         // ==========================================================
